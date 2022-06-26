@@ -1,6 +1,7 @@
 HELP.md
 .gradle
 build/
+target/
 
 ### STS ###
 .apt_generated
@@ -45,3 +46,4 @@ captures/
 
 ### Gradle ###
 !gradle/wrapper/gradle-wrapper.jar
+/target/
