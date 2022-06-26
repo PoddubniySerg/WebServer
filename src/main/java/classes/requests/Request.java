@@ -30,6 +30,14 @@ public class Request {
         } else {
             this.path = requestLine[1];
         }
+        if (headers.stream()
+                .filter(header -> header.startsWith("Content-Type"))
+                .anyMatch(header -> header.contains("x-www-form-urlencoded"))
+                && this.body != null
+                && !this.body.isEmpty()
+        ) {
+            this.params.addAll(URLEncodedUtils.parse(this.body, StandardCharsets.UTF_8));
+        }
     }
 
     public String getBody() {
