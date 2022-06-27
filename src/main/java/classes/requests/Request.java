@@ -100,15 +100,15 @@ public class Request {
         return this.params.stream().sorted(Comparator.comparing(NameValuePair::getName)).collect(Collectors.toList());
     }
 
-    public NameValuePair getQueryParam(String name) {
-        return this.params.stream().filter(param -> param.getName().equals(name)).findFirst().orElse(null);
+    public List<NameValuePair> getQueryParam(String name) {
+        return this.params.stream().filter(param -> param.getName().equals(name)).collect(Collectors.toList());
     }
 
     public List<FileItem> getParts() {
         return this.parts;
     }
 
-    public FileItem getPart(String name) {
-        return this.parts.stream().filter(part -> part.getFieldName().equals(name)).findFirst().orElse(null);
+    public List<FileItem> getPart(String name) {
+        return this.parts.stream().filter(part -> part.getFieldName().equals(name)).collect(Collectors.toList());
     }
 }
