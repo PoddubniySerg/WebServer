@@ -5,6 +5,7 @@ import classes.requests.Request;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 
 public class ForFormRequestHandler extends MainRequestHandler {
     public ForFormRequestHandler(String directory) {
@@ -22,7 +23,11 @@ public class ForFormRequestHandler extends MainRequestHandler {
         request.getHeaders().forEach(System.out::println);
         System.out.println();
         System.out.println("Body:");
-        System.out.println(request.getBody());
+        if (request.getParts().isEmpty()) {
+            System.out.println(request.getBody());
+            System.out.println();
+        }
+        request.getParts().forEach(part -> System.out.println(part.getFieldName() + ": " + new String(part.get(), StandardCharsets.UTF_8)));
         super.handle(request, responseStream);
     }
 }
