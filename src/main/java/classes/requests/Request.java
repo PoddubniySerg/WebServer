@@ -118,7 +118,7 @@ public class Request {
         return this.parts;
     }
 
-    public FileItem getPart(String name) {
-        return this.parts.stream().filter(part -> part.getFieldName().equals(name)).findFirst().orElse(null);
+    public List<FileItem> getPart(String name) {
+        return this.parts.stream().filter(part -> part.getFieldName().equals(name)).collect(Collectors.toList());
     }
 }
