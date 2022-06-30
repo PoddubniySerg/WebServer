@@ -43,7 +43,7 @@ public class MyServer {
                 final var in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 final var out = new BufferedOutputStream(socket.getOutputStream())
         ) {
-            while (!Thread.currentThread().isInterrupted() && !socket.isClosed()) {
+            while (!Thread.currentThread().isInterrupted() && !socket.isClosed() && in.ready()) {
                 // read only request line for simplicity
                 // must be in form GET /path HTTP/1.1
                 final var requestLine = in.readLine();
