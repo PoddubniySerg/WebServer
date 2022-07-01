@@ -5,11 +5,9 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.portlet.PortletFileUpload;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.hc.core5.http.NameValuePair;
-import org.apache.hc.core5.net.URLEncodedUtils;
+import org.apache.hc.core5.net.WWWFormCodec;
 
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -28,8 +26,7 @@ public class Request {
     List<FileItem> parts;
     private final String body;
 
-    @SuppressWarnings("deprecation")
-    public Request(String[] requestLine, List<String> headers, String body) throws URISyntaxException, FileUploadException {
+    public Request(String[] requestLine, List<String> headers, String body) throws FileUploadException {
         this.params = new ArrayList<>();
         this.parts = new ArrayList<>();
         this.method = requestLine[0];
@@ -37,7 +34,8 @@ public class Request {
         this.body = body;
         if (requestLine[1].contains("?")) {
             this.path = requestLine[1].substring(0, requestLine[1].indexOf('?'));
-            this.params.addAll(URLEncodedUtils.parse(new URI(requestLine[1]), DEFAULT_CHARSET));
+            this.params.addAll(WWWFormCodec.parse(
+                    requestLine[1].substring(requestLine[1].indexOf("?") + 1), DEFAULT_CHARSET));
         } else {
             this.path = requestLine[1];
         }
@@ -48,7 +46,7 @@ public class Request {
                 && !this.body.isEmpty()
         ) {
             if (contentType.contains("x-www-form-urlencoded")) {
-                this.params.addAll(URLEncodedUtils.parse(this.body, DEFAULT_CHARSET));
+                this.params.addAll(WWWFormCodec.parse(this.body, DEFAULT_CHARSET));
             }
             if (contentType.contains("multipart/form-data")) {
                 this.parts.addAll(this.parseMultipart(contentType.substring(contentType.indexOf(" ") + 1)));
