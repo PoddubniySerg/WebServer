@@ -1,10 +1,8 @@
 package classes.requests;
 
 import org.apache.hc.core5.http.NameValuePair;
-import org.apache.hc.core5.net.URLEncodedUtils;
+import org.apache.hc.core5.net.WWWFormCodec;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -19,14 +17,15 @@ public class Request {
     private final List<String> headers;
     private final String body;
 
-    public Request(String[] requestLine, List<String> headers, String body) throws URISyntaxException {
+    public Request(String[] requestLine, List<String> headers, String body) {
         this.params = new ArrayList<>();
         this.method = requestLine[0];
         this.headers = headers;
         this.body = body;
         if (requestLine[1].contains("?")) {
             this.path = requestLine[1].substring(0, requestLine[1].indexOf('?'));
-            this.params.addAll(URLEncodedUtils.parse(new URI(requestLine[1]), StandardCharsets.UTF_8));
+            this.params.addAll(WWWFormCodec.parse(
+                    requestLine[1].substring(requestLine[1].indexOf("?") + 1), StandardCharsets.UTF_8));
         } else {
             this.path = requestLine[1];
         }
