@@ -45,31 +45,28 @@ public class MyServer {
                 final var in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 final var out = new BufferedOutputStream(socket.getOutputStream())
         ) {
+            final var requestBuilder = new RequestBuilder();
             while (in.ready()) {
-                final var requestBuilder = new RequestBuilder();
-                while (in.ready()) {
-                    requestBuilder.addString(in.readLine());
-                }
-                final var request = requestBuilder.build();
-
-                if (!request.isRequestHttp()) {
-                    // just close socket
-                    return;
-                }
-
-                if (!this.handlers.containsKey(request.getMethod() + request.getPath())) {
-                    out.write((
-                            "HTTP/1.1 404 Not Found\r\n" +
-                                    "Content-Length: 0\r\n" +
-                                    "Connection: close\r\n" +
-                                    "\r\n"
-                    ).getBytes());
-                    out.flush();
-                    return;
-                }
-
-                this.handlers.get(request.getMethod() + request.getPath()).handle(request, out);
+                requestBuilder.addString(in.readLine());
             }
+            final var request = requestBuilder.build();
+
+            if (!request.isRequestHttp()) {
+                // just close socket
+                return;
+            }
+
+            if (!this.handlers.containsKey(request.getMethod() + request.getPath())) {
+                out.write((
+                        "HTTP/1.1 404 Not Found\r\n" +
+                                "Content-Length: 0\r\n" +
+                                "Connection: close\r\n" +
+                                "\r\n"
+                ).getBytes());
+                out.flush();
+                return;
+            }
+            this.handlers.get(request.getMethod() + request.getPath()).handle(request, out);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

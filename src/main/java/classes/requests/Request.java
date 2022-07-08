@@ -4,14 +4,15 @@ import java.util.List;
 
 public class Request {
 
-    private final String requestLine;
+    private final String method, path, version, body;
     private final List<String> headers;
-    private final String body;
 
-    public Request(String requestLine, List<String> headers, String body) {
-        this.requestLine = requestLine;
-        this.headers = headers;
+    public Request(String method, String path, String version, String body, List<String> headers) {
+        this.method = method;
+        this.path = path;
+        this.version = version;
         this.body = body;
+        this.headers = headers;
     }
 
     public String getBody() {
@@ -23,16 +24,25 @@ public class Request {
     }
 
     public String getMethod() {
-        return this.requestLine.split(" ")[0];
+        return this.method;
     }
 
     public String getPath() {
-        return this.requestLine.split(" ")[1];
+        return this.path;
+    }
+
+    public String getVersion() {
+        return version;
     }
 
     public boolean isRequestHttp() {
-        return !this.requestLine.isEmpty()
-                && this.requestLine.split(" ").length == 3
-                && this.requestLine.split(" ")[2].equals("HTTP/1.1");
+        return this.method != null
+                && this.path != null
+                && this.version != null
+                && !this.method.isEmpty()
+                && !this.path.isEmpty()
+                && !this.version.isEmpty()
+                && this.path.startsWith("/")
+                && this.version.equals("HTTP/1.1");
     }
 }
