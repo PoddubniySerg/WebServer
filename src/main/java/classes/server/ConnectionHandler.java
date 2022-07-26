@@ -2,6 +2,8 @@ package classes.server;
 
 import classes.requests.RequestBuilder;
 import interfaces.Handler;
+import org.apache.commons.fileupload.FileUploadException;
+
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -86,7 +88,7 @@ public class ConnectionHandler {
 //                handle request
             handlers.get(request.getMethod() + request.getPath()).handle(request, out);
 
-        } catch (IOException | URISyntaxException e) {
+        } catch (IOException | URISyntaxException | FileUploadException e) {
             throw new RuntimeException(e);
         }
     }

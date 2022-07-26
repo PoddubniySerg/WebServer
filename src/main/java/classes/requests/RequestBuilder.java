@@ -1,5 +1,8 @@
 package classes.requests;
 
+import org.apache.commons.fileupload.FileUploadException;
+
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +18,7 @@ public class RequestBuilder {
         this.headers = new ArrayList<>();
     }
 
-    public Request build() throws URISyntaxException {
+    public Request build() throws URISyntaxException, IOException, FileUploadException {
         return new Request(this.requestLine, this.headers, this.body);
     }
 
