@@ -1,57 +1,35 @@
-package classes;
+package classes.server;
 
 import classes.requests.RequestBuilder;
 import interfaces.Handler;
 import org.apache.commons.fileupload.FileUploadException;
 
-import java.io.*;
-import java.net.ServerSocket;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
 import java.net.Socket;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentMap;
 
-public class MyServer {
+public class ConnectionHandler {
 
-    private final ConcurrentMap<String, Handler> handlers;
-    private final ExecutorService threadPool;
     private final int maxRequestBufferInBytes;
-    private final List<String> allowedMethods;
 
-    public MyServer(int threadsInPool, int maxRequestBufferInBytes, List<String> allowedMethods) {
-        this.handlers = new ConcurrentHashMap<>();
-        this.threadPool = Executors.newFixedThreadPool(threadsInPool);
+    public ConnectionHandler(int maxRequestBufferInBytes) {
         this.maxRequestBufferInBytes = maxRequestBufferInBytes;
-        this.allowedMethods = allowedMethods;
     }
 
-    public void listen(int port) {
-        try (
-                final var serverSocket = new ServerSocket(port)
-        ) {
-            while (!serverSocket.isClosed()) {
-                var newClient = serverSocket.accept();
-                this.threadPool.execute(() -> connectClient(newClient));
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void addHandler(String method, String path, Handler handler) {
-        this.handlers.put(method + path, handler);
-    }
-
-    private void connectClient(Socket socket) {
+    public void connectClient(Socket socket, ConcurrentMap<String, Handler> handlers, List<String> allowedMethods) {
         try (
                 socket;
                 final var in = new BufferedInputStream(socket.getInputStream());
                 final var out = new BufferedOutputStream(socket.getOutputStream())
         ) {
-            in.mark(this.maxRequestBufferInBytes);
-            final var buffer = new byte[this.maxRequestBufferInBytes];
+            in.mark(maxRequestBufferInBytes);
+            final var buffer = new byte[maxRequestBufferInBytes];
             final var read = in.read(buffer);
             final var requestBuilder = new RequestBuilder();
 
@@ -64,7 +42,7 @@ public class MyServer {
             }
 
 //                get request line
-            final var requestLine = getRequestLine(buffer, requestLineEnd);
+            final var requestLine = getRequestLine(buffer, requestLineEnd, allowedMethods);
             if (requestLine == null) {
                 badRequest(out);
                 return;
@@ -95,7 +73,7 @@ public class MyServer {
 //                build request
             final var request = requestBuilder.build();
 
-            if (!this.handlers.containsKey(request.getMethod() + request.getPath())) {
+            if (!handlers.containsKey(request.getMethod() + request.getPath())) {
                 out.write((
                         "HTTP/1.1 404 Not Found\r\n" +
                                 "Content-Length: 0\r\n" +
@@ -107,21 +85,21 @@ public class MyServer {
             }
 
 //                handle request
-            this.handlers.get(request.getMethod() + request.getPath()).handle(request, out);
+            handlers.get(request.getMethod() + request.getPath()).handle(request, out);
 
         } catch (IOException | URISyntaxException | FileUploadException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private String[] getRequestLine(byte[] buffer, int requestLineEnd) {
+    private String[] getRequestLine(byte[] buffer, int requestLineEnd, List<String> allowedMethods) {
 
 //                read request line
         final var requestLine = new String(Arrays.copyOf(buffer, requestLineEnd)).split(" ");
         if (requestLine.length != 3) return null;
 
         final var method = requestLine[0];
-        if (!this.allowedMethods.contains(method)) return null;
+        if (!allowedMethods.contains(method)) return null;
 
         return requestLine;
     }
