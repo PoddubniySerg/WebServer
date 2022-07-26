@@ -1,12 +1,13 @@
 package classes.requests;
 
-import org.apache.commons.fileupload.*;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.ParameterParser;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.portlet.PortletFileUpload;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.net.WWWFormCodec;
-
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -27,7 +28,7 @@ public class Request {
     List<FileItem> parts;
     private final String body;
 
-    public Request(String[] requestLine, List<String> headers, String body) throws URISyntaxException, FileUploadException {
+    public Request(String[] requestLine, List<String> headers, String body) throws FileUploadException {
         this.parts = new ArrayList<>();
         this.queryParams = new ArrayList<>();
         this.postParams = new ArrayList<>();
