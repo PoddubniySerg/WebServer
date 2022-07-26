@@ -1,5 +1,5 @@
 import classes.handlers.ForClassicRequestHandler;
-import classes.MyServer;
+import classes.server.MyServer;
 import classes.handlers.ForFormRequestHandler;
 import classes.handlers.MainRequestHandler;
 
