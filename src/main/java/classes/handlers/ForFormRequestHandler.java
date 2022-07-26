@@ -16,7 +16,8 @@ public class ForFormRequestHandler extends MainRequestHandler {
         System.out.println();
         System.out.println("Method: " + request.getMethod());
         System.out.println("Path: " + request.getPath());
-        System.out.println("Params: " + request.getQueryParams());
+        System.out.println("Query params: " + request.getQueryParams());
+        System.out.println("Post params: " + request.getPostParams());
         System.out.println();
         System.out.println("Headers:");
         request.getHeaders().forEach(System.out::println);
