@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -8,11 +9,14 @@
   <title>Document</title>
 </head>
 <body>
-<h1>Forms Demo</h1>
-<form>
-  <input name="login" placeholder="Login">
-  <input name="password" type="password" placeholder="Password">
-  <button>Login</button>
+<form action="http://localhost:8888/forms.html?value=get-value">
+  <input> <!-- without name - никуда не отправится -->
+  <input name="title">
+  <input name="value">
+  <input name="value"> <!-- специально два поля с одним name -->
+  <input type="file" name="file"> <!-- для отправки файлов -->
+  <button>Send</button>
 </form>
 </body>
 </html>
+

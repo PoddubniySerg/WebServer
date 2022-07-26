@@ -5,6 +5,7 @@ import interfaces.Handler;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -17,7 +18,7 @@ public class MainRequestHandler implements Handler {
     }
 
     @Override
-    public void handle(Request request, BufferedOutputStream responseStream) throws IOException {
+    public void handle(Request request, BufferedOutputStream responseStream) throws IOException, URISyntaxException {
         Path filePath = Path.of(this.directory + request.getPath());
         final var mimeType = Files.probeContentType(filePath);
         final var length = Files.size(filePath);

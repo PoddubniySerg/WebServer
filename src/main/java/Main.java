@@ -1,16 +1,20 @@
 import classes.handlers.ForClassicRequestHandler;
-import classes.MyServer;
+import classes.server.MyServer;
+import classes.handlers.ForFormRequestHandler;
 import classes.handlers.MainRequestHandler;
 
 import java.util.List;
 
 public class Main {
+    public static final String GET = "GET";
+    public static final String POST = "POST";
 
     public static void main(String[] args) {
         final var threadsInPool = 64;
+        final var maxRequestBufferInBytes = 4096;
         final var port = 8888;
         final var directory = "public";
-        final var methods = List.of("GET", "POST");
+        final var allowedMethods = List.of(GET, POST);
         final var validPaths = List.of(
                 "/index.html",
                 "/spring.svg",
@@ -25,14 +29,18 @@ public class Main {
                 "/events.js"
         );
 
-        final var server = new MyServer(threadsInPool);
+        final var server = new MyServer(threadsInPool, maxRequestBufferInBytes, allowedMethods);
 
         // добавление handler'ов (обработчиков)
-        for (var method : methods) {
+        for (var method : allowedMethods) {
             for (var path : validPaths) {
-                server.addHandler(method,
-                        path,
-                        path.equals("/classic.html") ? new ForClassicRequestHandler(directory) : new MainRequestHandler(directory));
+                if (path.startsWith("/forms.html")) {
+                    server.addHandler(method, path, new ForFormRequestHandler(directory));
+                } else if (path.equals("/classic.html")) {
+                    server.addHandler(method, path, new ForClassicRequestHandler(directory));
+                } else {
+                    server.addHandler(method, path, new MainRequestHandler(directory));
+                }
             }
         }
         server.listen(port);
